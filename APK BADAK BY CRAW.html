@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK BADAK BY CRAW</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#08080a',
+                        darkCard: '#121218',
+                        crimson: {
+                            DEFAULT: '#dc2626',
+                            hover: '#b91c1c',
+                            glow: '#ff003c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #08080a;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.15), transparent 70%),
+                radial-gradient(circle at 0% 100%, rgba(185, 28, 28, 0.1), transparent 50%);
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        .glow-red {
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(220, 38, 38, 0.7);
+        }
+        .glass-card {
+            background: rgba(18, 18, 24, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(220, 38, 38, 0.25);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #08080a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dc2626;
+            border-radius: 4px;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; filter: drop-shadow(0 0 10px #dc2626); }
+        }
+        .pulse-danger {
+            animation: pulseGlow 2s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen overflow-x-hidden selection:bg-red-600 selection:text-white">
+
+    <!-- TOP ALERT TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4"></div>
+
+    <!-- FULLSCREEN LOADING OVERLAY -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center text-center p-4">
+        <div class="relative w-24 h-24 mb-6">
+            <div class="absolute inset-0 rounded-full border-4 border-red-900 border-t-red-600 animate-spin glow-red"></div>
+            <div class="absolute inset-2 rounded-full border-4 border-red-950 border-b-red-500 animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i class="fa-solid fa-skull text-3xl text-red-600 pulse-danger"></i>
+            </div>
+        </div>
+        <h2 id="loadingText" class="text-2xl font-bold tracking-wider text-red-500 font-mono text-glow mb-2">MEMUAT SISTEM BADAK...</h2>
+        <p class="text-xs text-gray-400 font-mono tracking-widest uppercase">Processing Security Verification</p>
+    </div>
+
+    <!-- AUTHENTICATION SECTION -->
+    <div id="authSection" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-2xl border-red-900/40">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-900 to-transparent"></div>
+            
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-950/60 border border-red-600/50 mb-3 glow-red">
+                    <i class="fa-solid fa-shield-halved text-3xl text-red-500"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white font-mono">APK BADAK <span class="text-red-600 text-glow">CRAW</span></h1>
+                <p class="text-xs text-red-400/80 font-mono mt-1 tracking-widest">SYSTEM PROTECTION & HARDENING TOOL</p>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="loginFormBlock">
+                <div id="loginErrorBanner" class="hidden mb-5 p-3 rounded-xl bg-red-950/80 border border-red-600 text-red-200 text-xs text-center font-bold font-mono tracking-wider animate-pulse">
+                    <i class="fa-solid fa-triangle-exclamation mr-1 text-red-500"></i>
+                    <span id="loginErrorMessage">USERNAME BELUM TERDAFTAR</span>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-mono font-semibold text-gray-300 uppercase mb-2">USERNAME</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="loginUsername" required placeholder="Masukkan Username" 
+                                class="w-full pl-10 pr-4 py-3 bg-black/60 border border-red-900/60 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 font-mono text-sm transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono font-semibold text-gray-300 uppercase mb-2">SANDI USERNAME</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input type="password" id="loginPassword" required placeholder="Masukkan Sandi" 
+                                class="w-full pl-10 pr-12 py-3 bg-black/60 border border-red-900/60 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 font-mono text-sm transition">
+                            <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginPassEye')" 
+                                class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-red-500 focus:outline-none z-10 cursor-pointer">
+                                <i id="loginPassEye" class="fa-solid fa-eye-slash text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 space-y-3">
+                        <button type="submit" 
+                            class="w-full py-3.5 px-4 bg-red-600 hover:bg-red-700 text-white font-bold font-mono rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 tracking-wider">
+                            <i class="fa-solid fa-right-to-bracket"></i> MASUK
+                        </button>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+                            <button type="button" onclick="showRegisterForm()" 
+                                class="py-2.5 px-2 bg-zinc-900 hover:bg-zinc-800 text-red-400 border border-red-900/40 rounded-xl font-mono font-semibold transition text-center">
+                                <i class="fa-solid fa-user-plus mr-1"></i> BUAT AKUN
+                            </button>
+                            <button type="button" onclick="handleLogin(event)" 
+                                class="py-2.5 px-2 bg-red-950/40 hover:bg-red-900/60 text-gray-300 border border-red-800/50 rounded-xl font-mono text-[11px] font-semibold transition text-center">
+                                <i class="fa-solid fa-shield-check mr-1 text-red-500"></i> VERIFIKASI & LOGIN
+                            </button>
+                        </div>
+
+                        <!-- OWNER CRAW SPECIAL ACCESS BUTTON -->
+                        <div class="pt-2 border-t border-red-900/40">
+                            <button type="button" onclick="openOwnerModal()" 
+                                class="w-full py-3 px-3 bg-amber-950/40 hover:bg-amber-900/60 text-amber-400 border border-amber-600/60 rounded-xl font-mono text-xs font-bold transition text-center flex items-center justify-center gap-2 shadow-inner hover:scale-[1.01]">
+                                <i class="fa-solid fa-crown text-amber-500"></i> MASUK KHUSUS OWNER CRAW
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerFormBlock" class="hidden">
+                <form onsubmit="handleRegister(event)" class="space-y-4">
+                    <h3 class="text-sm font-bold font-mono text-red-500 uppercase tracking-wider mb-2">BUAT AKUN BARU</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-mono text-gray-300 mb-1">USERNAME BARU</label>
+                        <input type="text" id="regUsername" required placeholder="Buat Username" 
+                            class="w-full px-4 py-3 bg-black/60 border border-red-900/60 rounded-xl text-white font-mono text-sm focus:outline-none focus:border-red-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-gray-300 mb-1">SANDI USERNAME</label>
+                        <div class="relative">
+                            <input type="password" id="regPassword" required placeholder="Buat Sandi" 
+                                class="w-full pl-4 pr-12 py-3 bg-black/60 border border-red-900/60 rounded-xl text-white font-mono text-sm focus:outline-none focus:border-red-600">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword', 'regPassEye')" 
+                                class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-red-500 focus:outline-none z-10 cursor-pointer">
+                                <i id="regPassEye" class="fa-solid fa-eye-slash text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 space-y-2">
+                        <button type="submit" 
+                            class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold font-mono rounded-xl shadow-lg transition">
+                            DAFTAR SEKARANG
+                        </button>
+                        <button type="button" onclick="showLoginForm()" 
+                            class="w-full py-2.5 bg-transparent hover:bg-zinc-900 text-gray-400 font-mono text-xs rounded-xl transition text-center">
+                            Sudah Punya Akun? Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- OWNER SECRET CODE MODAL -->
+    <div id="ownerModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-sm w-full p-6 rounded-2xl border-amber-600/80 shadow-2xl relative">
+            <button onclick="closeOwnerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-4">
+                <div class="w-14 h-14 bg-amber-950/80 border border-amber-500/50 rounded-full flex items-center justify-center mx-auto mb-2 text-amber-400 shadow-lg">
+                    <i class="fa-solid fa-key text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold font-mono text-amber-400">AKSES OWNER CRAW</h3>
+                <p class="text-xs font-mono text-gray-300 mt-1 uppercase font-bold">MASUKAN KODE RAHASIA ADMIN</p>
+            </div>
+
+            <div id="ownerModalError" class="hidden mb-4 p-3 bg-red-950 border border-red-600 text-red-200 text-xs font-mono font-bold text-center rounded-xl animate-bounce">
+                ⚠️ KODE SALAH SILAHKAN BALIK KE MENU AWAL
+            </div>
+
+            <form onsubmit="handleOwnerSecretSubmit(event)" class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="ownerSecretInput" placeholder="Masukkan Kode Rahasia" required autofocus
+                        class="w-full pl-4 pr-12 py-3 bg-black/90 border border-amber-600/70 rounded-xl text-center text-amber-300 font-mono text-lg font-bold tracking-widest focus:outline-none focus:border-amber-400 shadow-inner">
+                    <button type="button" onclick="togglePasswordVisibility('ownerSecretInput', 'ownerSecretEye')" 
+                        class="absolute inset-y-0 right-0 px-3 flex items-center text-amber-500 hover:text-amber-300 focus:outline-none z-10 cursor-pointer">
+                        <i id="ownerSecretEye" class="fa-solid fa-eye-slash text-base"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="closeOwnerModal()" class="py-3 px-3 bg-zinc-900 hover:bg-zinc-800 text-gray-300 font-mono text-xs rounded-xl font-bold transition">
+                        BALIK MENU
+                    </button>
+                    <button type="submit" class="py-3 px-3 bg-amber-600 hover:bg-amber-700 text-black font-mono text-xs font-extrabold rounded-xl transition shadow-lg">
+                        VERIFIKASI
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP DASHBOARD -->
+    <div id="mainDashboard" class="hidden flex-col min-h-screen">
+        <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-md border-b border-red-900/50 px-4 py-3 flex items-center justify-between shadow-lg">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="p-2 text-red-500 hover:text-white rounded-lg hover:bg-red-950/50 focus:outline-none transition">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-biohazard text-red-600 text-xl pulse-danger"></i>
+                    <h1 class="text-lg sm:text-xl font-extrabold font-mono tracking-wider text-white">
+                        APK BADAK <span class="text-red-600 text-glow">BY CRAW</span>
+                    </h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block font-mono">
+                    <div id="headerUserDisplay" class="text-xs font-bold text-gray-200">User</div>
+                    <span id="headerRoleBadge" class="inline-block px-2 py-0.5 text-[10px] rounded bg-red-950 border border-red-700 text-red-400 font-bold uppercase">FREE</span>
+                </div>
+                <button onclick="handleLogout()" class="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-950/30 transition" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- SIDEBAR / HAMBURGER MENU -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+        <aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-zinc-950 border-r border-red-900/50 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between">
+            <div class="p-5">
+                <div class="flex items-center justify-between pb-4 border-b border-red-900/40">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-shield-virus text-red-600 text-2xl"></i>
+                        <span class="font-mono font-extrabold text-white tracking-wider">CRAW MENU</span>
+                    </div>
+                    <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 p-3 bg-zinc-900/80 border border-red-900/30 rounded-xl font-mono">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Pengguna Aktif</p>
+                    <p id="sidebarUsername" class="text-sm font-bold text-white truncate">Username</p>
+                    <p id="sidebarVipStatus" class="text-[11px] text-red-400 mt-1 font-semibold">Status: Standard Member</p>
+                </div>
+
+                <nav class="mt-6 space-y-2 font-mono">
+                    <button onclick="switchTab('dashboard')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-950/50 text-gray-300 hover:text-red-400 transition">
+                        <i class="fa-solid fa-house text-red-500 w-5"></i>
+                        <span class="text-sm font-semibold">Dashboard Utama</span>
+                    </button>
+                    
+                    <button onclick="switchTab('tools')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-950/50 text-gray-300 hover:text-red-400 transition">
+                        <i class="fa-solid fa-bolt text-red-500 w-5"></i>
+                        <span class="text-sm font-semibold">TOOLS BADAK WHATSAPP</span>
+                    </button>
+
+                    <!-- MENU VVIP BISA DILIHAT SEMUA ORANG -->
+                    <button onclick="switchTab('vvip')" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-amber-950/50 text-amber-300 hover:text-amber-200 border border-amber-900/30 transition shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-crown text-amber-400 w-5 animate-pulse"></i>
+                            <span class="text-xs font-bold tracking-tight">TOLS BADAK WHATSAPP KHUSUS VVIP</span>
+                        </div>
+                        <i id="sidebarVipLockIcon" class="fa-solid fa-lock text-xs text-amber-500"></i>
+                    </button>
+
+                    <button onclick="switchTab('vip')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-950/50 text-gray-300 hover:text-red-400 transition">
+                        <i class="fa-solid fa-crown text-amber-500 w-5"></i>
+                        <span class="text-sm font-semibold">BERLANGGANAN VIP (QRIS)</span>
+                    </button>
+
+                    <button onclick="switchTab('admin')" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-red-950/50 text-gray-300 hover:text-red-400 transition">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-user-gear text-red-600 w-5"></i>
+                            <span class="text-sm font-semibold">PANEL OWNER / ADMIN</span>
+                        </div>
+                        <i class="fa-solid fa-lock text-xs text-gray-500"></i>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-red-900/40">
+                <button onclick="handleLogout()" class="w-full py-2.5 px-4 bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-800/60 rounded-xl font-mono text-xs font-bold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off"></i> KELUAR DARI SYSTEM
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+            <!-- TAB 1: DASHBOARD UTAMA -->
+            <section id="tab-dashboard" class="space-y-6">
+                <div class="space-y-3">
+                    <div class="p-4 rounded-xl bg-red-950/60 border-2 border-red-600/80 text-red-200 font-mono text-xs sm:text-sm leading-relaxed shadow-lg flex items-start gap-3">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <p class="font-bold tracking-wide uppercase text-red-400 mb-1">PERINGATAN RESMI:</p>
+                            <p>⚠️ WEB INI HANYA MEMBANTU ANDA UNTUK MENGUATKAN NOMOR WHATSAPP ANDA MENJADI TIDAK GAMPANG KENON, BUKAN BERARTI KEBAL TERHADAP KENON ⚠️</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-amber-950/40 border border-amber-600/60 text-amber-200 font-mono text-xs sm:text-sm leading-relaxed shadow-md flex items-start gap-3">
+                        <i class="fa-solid fa-radiation text-amber-500 text-xl flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <p class="font-bold tracking-wide uppercase text-amber-400 mb-1">PERHATIAN PENGGUNAAN:</p>
+                            <p>⚠️ JANGAN TERLALU SERING BADAKIN WHATSAPP NANTI GAMPANG KENON SEPERTI SEMULA ⚠️</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+                    <div class="relative z-10 space-y-4">
+                        <div class="inline-block px-3 py-1 bg-red-950 border border-red-600 text-red-400 rounded-full text-xs font-mono font-bold">
+                            SYSTEM ACTIVE v3.0
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white font-mono">
+                            SELAMAT DATANG DI <span class="text-red-600 text-glow">APK BADAK BY CRAW</span>
+                        </h2>
+                        <p class="text-gray-300 text-sm max-w-2xl leading-relaxed">
+                            Gunakan alat penguat nomor WhatsApp ini dengan bijak. Layanan ini dirancang khusus untuk memproteksi akun WhatsApp Anda dari kenon otomatis / spam report.
+                        </p>
+                        
+                        <div class="pt-4 flex flex-wrap gap-4">
+                            <button onclick="switchTab('tools')" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-mono font-bold text-sm rounded-xl shadow-lg transition flex items-center gap-2">
+                                <i class="fa-solid fa-wrench"></i> BUKA TOOLS BADAK
+                            </button>
+                            <button onclick="switchTab('vip')" class="px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-500/50 font-mono font-bold text-sm rounded-xl transition flex items-center gap-2">
+                                <i class="fa-solid fa-crown"></i> BERLANGGANAN VIP (Rp 10.000)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: TOOLS BADAK WHATSAPP -->
+            <section id="tab-tools" class="hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 border-red-900/50">
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-red-900/40">
+                        <i class="fa-solid fa-mobile-screen-button text-red-500 text-2xl"></i>
+                        <div>
+                            <h2 class="text-xl font-bold font-mono text-white">TOOLS BADAK WHATSAPP</h2>
+                            <p class="text-xs text-gray-400 font-mono">Verifikasi nomor WhatsApp & Jalankan Metode Proteksi Badak</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-mono font-semibold text-gray-300 uppercase mb-1">
+                                NOMOR WHATSAPP
+                            </label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-red-500 font-mono text-sm font-bold">+</span>
+                                <input type="text" id="waNumberInput" placeholder="628xxxxxxxxxx" 
+                                    class="w-full pl-8 pr-4 py-3 bg-black/70 border border-red-900/60 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-red-600 font-mono text-sm">
+                            </div>
+                            <p class="text-xs text-red-400 font-mono mt-1 font-semibold">
+                                Note: 62xxx (tanpa "+" ataupun spasi)
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="sendOtp()" class="py-3 px-4 bg-zinc-900 hover:bg-zinc-800 text-red-400 border border-red-800/60 font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> KIRIM KODE OTP
+                            </button>
+                            
+                            <div class="flex gap-2">
+                                <input type="text" id="otpCodeInput" maxlength="6" placeholder="Kode OTP" 
+                                    class="w-full px-3 py-3 bg-black/70 border border-red-900/60 rounded-xl text-center text-white placeholder-gray-600 focus:outline-none focus:border-red-600 font-mono text-sm tracking-widest">
+                                <button onclick="verifyOtp()" class="py-3 px-4 bg-red-950 hover:bg-red-900 text-white font-mono font-bold text-xs rounded-xl border border-red-700 transition whitespace-nowrap">
+                                    VERIFIKASI
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="otpStatusBanner" class="hidden p-3 rounded-xl font-mono text-xs font-bold text-center"></div>
+                    </div>
+
+                    <hr class="border-red-900/40 my-8">
+
+                    <!-- METHOD SELECTION -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold font-mono text-gray-300 uppercase tracking-wider">PILIH METODE BADAK:</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- MENU 1: NORMAL METHOD -->
+                            <div class="p-5 rounded-2xl bg-zinc-950 border border-red-900/40 flex flex-col justify-between space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="px-2.5 py-1 bg-green-950 text-green-400 border border-green-800 rounded text-[10px] font-mono font-bold">GRATIS / NORMAL</span>
+                                        <i class="fa-solid fa-shield text-gray-500"></i>
+                                    </div>
+                                    <h4 class="text-base font-bold font-mono text-white">MULAI BADAK (metode normal)</h4>
+                                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                                        Proteksi standar untuk menjaga ketahanan nomor dari laporan massal standar.
+                                    </p>
+                                </div>
+                                <button onclick="runBadakMethod('normal')" 
+                                    class="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-mono font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-play"></i> JALANKAN METODE NORMAL
+                                </button>
+                            </div>
+
+                            <!-- MENU 2: PRIVATE METHOD -->
+                            <div class="p-5 rounded-2xl bg-zinc-950 border border-amber-900/40 relative overflow-hidden flex flex-col justify-between space-y-4">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="px-2.5 py-1 bg-amber-950 text-amber-400 border border-amber-800 rounded text-[10px] font-mono font-bold">VIP / BERLANGGANAN</span>
+                                        <i id="privateLockIcon" class="fa-solid fa-lock text-amber-500"></i>
+                                    </div>
+                                    <h4 class="text-base font-bold font-mono text-white flex items-center gap-2">
+                                        MULAI BADAK PRIVATE
+                                        <span class="text-xs text-amber-400 font-normal">(Rp 10.000)</span>
+                                    </h4>
+                                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                                        Proteksi maksimal tingkat tinggi. Memperkuat WhatsApp secara instan & anti-kenon ketat.
+                                    </p>
+                                </div>
+
+                                <div id="privateButtonContainer"></div>
+                            </div>
+                        </div>
+
+                        <!-- AUTO-SCROLL NOTIFICATION BANNER -->
+                        <div id="scrollInstructionBanner" class="hidden my-3 p-3 bg-red-950/90 border border-red-600 text-red-200 font-mono text-xs font-bold text-center rounded-xl animate-pulse shadow-lg">
+                            ⚠️ SYSTEMS SEDANG MEMROSES SCROL KE BAWAH UNTUK MELIHAT ⬇️
+                        </div>
+
+                        <!-- LIVE CODING TERMINAL CONSOLE BOX -->
+                        <div id="codingConsoleBox" class="hidden mt-4 p-4 rounded-2xl bg-black border-2 border-red-600/80 font-mono text-xs shadow-2xl relative">
+                            <div class="flex items-center justify-between pb-2 mb-3 border-b border-red-900/50">
+                                <div class="flex items-center gap-2 text-red-500">
+                                    <i class="fa-solid fa-terminal animate-pulse"></i>
+                                    <span class="font-bold tracking-wider">CRAW_INJECTION_TERMINAL v3.0 💻</span>
+                                </div>
+                                <span id="consoleStatusBadge" class="px-2.5 py-1 bg-red-950 text-red-400 border border-red-700 rounded text-[10px] font-bold animate-pulse">🚥 MENGEKSEKUSI KODE...</span>
+                            </div>
+                            
+                            <div id="terminalLogContent" class="h-48 overflow-y-auto space-y-2 text-green-400 text-[11px] bg-zinc-950/80 p-3 rounded-xl border border-zinc-900 select-none"></div>
+
+                            <!-- SUCCESS NOTIFICATION BAR -->
+                            <div id="processReadyAlert" class="hidden mt-3 p-3.5 bg-red-950 border-2 border-red-600 text-red-200 font-bold text-center rounded-xl animate-bounce tracking-widest text-xs shadow-lg">
+                                ✅ 🚀 PROSES BADAK SUDAH SIAP ‼️
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2.5: TOOLS BADAK WHATSAPP KHUSUS VVIP (BISA DILIHAT SEMUA ORANG, TAPI DIKUNCI / TAMPILKAN "ANDA BELUM BERLANGGANAN") -->
+            <section id="tab-vvip" class="hidden space-y-6">
+                <!-- BANNER PERINGATAN JIKA BELUM BERLANGGANAN -->
+                <div id="vvipWarningBanner" class="hidden p-4 rounded-xl bg-amber-950/80 border-2 border-amber-500 text-amber-200 font-mono text-xs sm:text-sm font-bold text-center shadow-xl animate-pulse">
+                    ⚠️ ANDA BELUM BERLANGGANAN ‼️ SILAHKAN BERLANGGANAN VIP TERLEBIH DAHULU UNTUK MENGGUNAKAN FITUR INI.
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 border-amber-600/50">
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-amber-900/40">
+                        <i class="fa-solid fa-crown text-amber-400 text-2xl animate-pulse"></i>
+                        <div>
+                            <h2 class="text-xl font-bold font-mono text-white">TOOLS BADAK WHATSAPP KHUSUS VVIP</h2>
+                            <p class="text-xs text-amber-300/80 font-mono">Verifikasi nomor WhatsApp & Eksekusi Pilihan Metode VVIP Multi-Tingkat</p>
+                        </div>
+                    </div>
+
+                    <!-- INPUT NOMOR & OTP VVIP -->
+                    <div class="space-y-4 max-w-xl">
+                        <div>
+                            <label class="block text-xs font-mono font-semibold text-gray-300 uppercase mb-1">
+                                NOMOR WHATSAPP TARGET VVIP
+                            </label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-500 font-mono text-sm font-bold">+</span>
+                                <input type="text" id="vvipWaNumberInput" placeholder="628xxxxxxxxxx" 
+                                    class="w-full pl-8 pr-4 py-3 bg-black/70 border border-amber-900/60 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 font-mono text-sm">
+                            </div>
+                            <p class="text-xs text-amber-400 font-mono mt-1 font-semibold">
+                                Note: 62xxx (tanpa "+" ataupun spasi)
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="sendVipOtp()" class="py-3 px-4 bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-800/60 font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> KIRIM KODE OTP VVIP
+                            </button>
+                            
+                            <div class="flex gap-2">
+                                <input type="text" id="vvipOtpCodeInput" maxlength="6" placeholder="Kode OTP" 
+                                    class="w-full px-3 py-3 bg-black/70 border border-amber-900/60 rounded-xl text-center text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 font-mono text-sm tracking-widest">
+                                <button onclick="verifyVipOtp()" class="py-3 px-4 bg-amber-950 hover:bg-amber-900 text-amber-300 font-mono font-bold text-xs rounded-xl border border-amber-700 transition whitespace-nowrap">
+                                    VERIFIKASI
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="vvipOtpStatusBanner" class="hidden p-3 rounded-xl font-mono text-xs font-bold text-center"></div>
+                    </div>
+
+                    <hr class="border-amber-900/40 my-8">
+
+                    <!-- PILIHAN 5 METODE VVIP BARU (DAPAT DILIHAT, TAPI DIKUNCI / TIDAK BISA DIKLIK JIKA BELUM LANGGANAN) -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold font-mono text-amber-400 uppercase tracking-wider">PILIH METODE BADAK KHUSUS VVIP:</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- METODE HIGH -->
+                            <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-900/40 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800 rounded text-[9px] font-mono font-bold">VVIP LEVEL 1</span>
+                                    <h4 class="text-sm font-bold font-mono text-white mt-2">MULAI BADAK (metode high)</h4>
+                                    <p class="text-[11px] text-gray-400 mt-1">Proteksi tingkat tinggi untuk ketahanan ekstra nomor WhatsApp.</p>
+                                </div>
+                                <button onclick="runVipBadakMethod('high')" class="w-full py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-black font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                                    <i class="fa-solid fa-bolt"></i> EKSEKUSI HIGH
+                                </button>
+                            </div>
+
+                            <!-- METODE BRUTAL -->
+                            <div class="p-4 rounded-2xl bg-zinc-950 border border-red-900/50 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 rounded text-[9px] font-mono font-bold">VVIP LEVEL 2</span>
+                                    <h4 class="text-sm font-bold font-mono text-white mt-2">MULAI BADAK (metode brutal)</h4>
+                                    <p class="text-[11px] text-gray-400 mt-1">Injeksi protokol ekstrem menembus pengamanan ketat server WA.</p>
+                                </div>
+                                <button onclick="runVipBadakMethod('brutal')" class="w-full py-2.5 px-3 bg-red-600 hover:bg-red-700 text-white font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                                    <i class="fa-solid fa-fire"></i> EKSEKUSI BRUTAL
+                                </button>
+                            </div>
+
+                            <!-- METODE PREMIUM -->
+                            <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-900/40 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800 rounded text-[9px] font-mono font-bold">VVIP LEVEL 3</span>
+                                    <h4 class="text-sm font-bold font-mono text-white mt-2">MULAI BADAK (metode premium)</h4>
+                                    <p class="text-[11px] text-gray-400 mt-1">Algoritma eksklusif prioritas tinggi khusus member terverifikasi.</p>
+                                </div>
+                                <button onclick="runVipBadakMethod('premium')" class="w-full py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-black font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                                    <i class="fa-solid fa-gem"></i> EKSEKUSI PREMIUM
+                                </button>
+                            </div>
+
+                            <!-- METODE V1 -->
+                            <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-900/40 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800 rounded text-[9px] font-mono font-bold">VVIP V1</span>
+                                    <h4 class="text-sm font-bold font-mono text-white mt-2">MULAI BADAK (metode v1)</h4>
+                                    <p class="text-[11px] text-gray-400 mt-1">Versi klasik stabil penangkal banned massal.</p>
+                                </div>
+                                <button onclick="runVipBadakMethod('v1')" class="w-full py-2.5 px-3 bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                                    <i class="fa-solid fa-code"></i> EKSEKUSI V1
+                                </button>
+                            </div>
+
+                            <!-- METODE V2 -->
+                            <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-900/40 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800 rounded text-[9px] font-mono font-bold">VVIP V2</span>
+                                    <h4 class="text-sm font-bold font-mono text-white mt-2">MULAI BADAK (metode v2)</h4>
+                                    <p class="text-[11px] text-gray-400 mt-1">Penyempurnaan enkripsi socket generasi kedua.</p>
+                                </div>
+                                <button onclick="runVipBadakMethod('v2')" class="w-full py-2.5 px-3 bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                                    <i class="fa-solid fa-terminal"></i> EKSEKUSI V2
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- AUTO-SCROLL NOTIFICATION BANNER VVIP -->
+                        <div id="vvipScrollInstructionBanner" class="hidden my-3 p-3 bg-amber-950/90 border border-amber-500 text-amber-200 font-mono text-xs font-bold text-center rounded-xl animate-pulse shadow-lg">
+                            ⚠️ SYSTEMS SEDANG MEMROSES SCROL KE BAWAH UNTUK MELIHAT ⬇️
+                        </div>
+
+                        <!-- TERMINAL CONSOLE BOX VVIP -->
+                        <div id="vvipCodingConsoleBox" class="hidden mt-4 p-4 rounded-2xl bg-black border-2 border-amber-500/80 font-mono text-xs shadow-2xl relative">
+                            <div class="flex items-center justify-between pb-2 mb-3 border-b border-amber-950">
+                                <div class="flex items-center gap-2 text-amber-400">
+                                    <i class="fa-solid fa-terminal animate-pulse"></i>
+                                    <span class="font-bold tracking-wider">CRAW_VVIP_INJECTION_TERMINAL 💻</span>
+                                </div>
+                                <span id="vvipConsoleStatusBadge" class="px-2.5 py-1 bg-amber-950 text-amber-300 border border-amber-600 rounded text-[10px] font-bold animate-pulse">🚥 MENGEKSEKUSI KODE...</span>
+                            </div>
+                            
+                            <div id="vvipTerminalLogContent" class="h-48 overflow-y-auto space-y-2 text-amber-400 text-[11px] bg-zinc-950/80 p-3 rounded-xl border border-zinc-900 select-none"></div>
+
+                            <!-- SUCCESS NOTIFICATION BAR VVIP -->
+                            <div id="vvipProcessReadyAlert" class="hidden mt-3 p-3.5 bg-amber-950 border-2 border-amber-500 text-amber-200 font-bold text-center rounded-xl animate-bounce tracking-widest text-xs shadow-lg">
+                                ✅ 🚀 PROSES BADAK VVIP SUDAH SIAP ‼️
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: BERLANGGANAN VIP (QRIS) -->
+            <section id="tab-vip" class="hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 border-red-900/50">
+                    <div class="text-center max-w-md mx-auto space-y-4">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-950/80 border border-amber-500/50 text-amber-400 mb-1">
+                            <i class="fa-solid fa-crown text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-extrabold font-mono text-white">BERLANGGANAN VIP BADAK</h2>
+                        <p class="text-xs text-gray-300 font-mono bg-red-950/60 border border-red-800/60 p-2.5 rounded-xl">
+                            Berlangganan Rp10.000 Tanpa Batas (Lifetime / Unlimited Access)
+                        </p>
+
+                        <!-- DISPLAY QRIS MENGGUNAKAN GAMBAR ASLI DARI IMGBB AGAR BISA DI-SCAN DANA / M-BANKING -->
+                        <div class="bg-white p-4 rounded-2xl shadow-2xl text-black text-center space-y-3 mx-auto max-w-xs border-4 border-red-600 relative group">
+                            <div class="bg-white p-1 inline-block rounded-lg my-1 relative cursor-pointer" title="Tekan / Klik untuk memperbesar QRIS" onclick="openQrisModal()">
+                                <img id="qrisImageElement" src="https://i.ibb.co.com/84j7qg8/2565-2.jpg" 
+                                    alt="QRIS CRAW STORE" 
+                                    class="w-full h-auto mx-auto object-contain hover:scale-105 transition duration-200 rounded">
+                                <span class="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">🔍 KLIK</span>
+                            </div>
+                        </div>
+
+                        <!-- TEKS PERMINTAAN: BUKTI TF KIRIM KE NOMOR 6289679341517 (craw) -->
+                        <div class="p-3 bg-red-950/90 border border-red-600/80 rounded-xl text-red-200 text-xs font-mono font-bold leading-relaxed shadow-md">
+                            BUKTI TF KIRIM KE NOMOR 6289679341517 (craw)
+                        </div>
+
+                        <!-- KETERANGAN JIKA QR TIDAK JELAS / GABISA DI SCAN -->
+                        <div class="p-3 bg-amber-950/90 border border-amber-500/80 rounded-xl text-amber-200 text-xs font-mono font-bold leading-relaxed shadow-md">
+                            ⚠️ JIKA QR TIDAK JELAS / GABISA DI SCAN SILAHKAN CHAT WHATSAPP ADMIN UTAMA
+                        </div>
+
+                        <div class="pt-2 space-y-3">
+                            <!-- TOMBOL WHATSAPP DENGAN URL STABLE API -->
+                            <button onclick="openWhatsAppConfirmation()" 
+                                class="inline-flex items-center justify-center gap-2 w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-mono font-bold text-xs rounded-xl shadow-lg transition cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-lg"></i> KIRIM BUKTI TF VIA WHATSAPP
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: PANEL OWNER / ADMIN CRAW -->
+            <section id="tab-admin" class="hidden space-y-6">
+                <div id="adminDeniedCard" class="hidden glass-card rounded-2xl p-8 text-center border-red-600/80">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-950 border-2 border-red-600 text-red-500 mb-4 pulse-danger">
+                        <i class="fa-solid fa-lock text-4xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-extrabold font-mono text-red-500 tracking-wider mb-2">AKSES DITOLAK!</h2>
+                    <p class="text-sm font-mono text-gray-300 max-w-md mx-auto bg-black/60 p-4 rounded-xl border border-red-900/60">
+                        TIDAK BISA AKSES KE DALAM ADMIN / OWNER CRAW
+                    </p>
+                    <p class="text-xs text-gray-500 font-mono mt-4">Menu ini hanya dapat dibuka oleh Owner CRAW.</p>
+                </div>
+
+                <div id="adminContentBlock" class="space-y-6">
+                    <div class="flex items-center justify-between glass-card p-6 rounded-2xl border-red-900/50">
+                        <div>
+                            <span class="px-3 py-1 bg-red-950 text-red-400 border border-red-600 rounded text-xs font-mono font-bold">OWNER MODE</span>
+                            <h2 class="text-2xl font-extrabold font-mono text-white mt-1">PANEL OWNER / ADMIN CRAW</h2>
+                            <p class="text-xs text-gray-400 font-mono">Kelola pendaftaran pengguna, status VIP, pemblokiran akun, dan hak akses owner.</p>
+                        </div>
+                        <i class="fa-solid fa-user-shield text-4xl text-red-600 hidden sm:block"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+                        <div class="glass-card p-5 rounded-2xl border-red-900/40">
+                            <p class="text-xs text-gray-400 uppercase">Total User Terdaftar</p>
+                            <p id="adminTotalUsers" class="text-3xl font-extrabold text-red-500 mt-1">0</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-2xl border-amber-900/40">
+                            <p class="text-xs text-gray-400 uppercase">User VIP (Berlangganan)</p>
+                            <p id="adminVipUsers" class="text-3xl font-extrabold text-amber-400 mt-1">0</p>
+                        </div>
+                        <div class="glass-card p-5 rounded-2xl border-zinc-800">
+                            <p class="text-xs text-gray-400 uppercase">User Diblokir</p>
+                            <p id="adminBlockedUsers" class="text-3xl font-extrabold text-gray-400 mt-1">0</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border-red-900/50 overflow-hidden">
+                        <h3 class="text-base font-bold font-mono text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-red-500"></i> DAFTAR PENGGUNA TERDAFTAR (USER & SANDI)
+                        </h3>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left font-mono text-xs">
+                                <thead>
+                                    <tr class="border-b border-red-900/50 bg-black/40 text-gray-400">
+                                        <th class="p-3">USERNAME</th>
+                                        <th class="p-3">SANDI</th>
+                                        <th class="p-3">ROLE</th>
+                                        <th class="p-3">STATUS VIP</th>
+                                        <th class="p-3">STATUS AKUN</th>
+                                        <th class="p-3 text-right">AKSI OWNER</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUserTableBody" class="divide-y divide-red-900/20"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL POPUP QRIS UNTUK MEMPERBESAR / SCAN -->
+    <div id="qrisModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="closeQrisModal()">
+        <div class="glass-card max-w-sm w-full p-6 rounded-2xl border-red-600 text-center space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-mono font-bold text-red-400">QRIS CRAW STORE</span>
+                <button onclick="closeQrisModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="bg-white p-3 rounded-xl border-2 border-black inline-block">
+                <img src="https://i.ibb.co.com/84j7qg8/2565-2.jpg" 
+                    alt="QRIS Zoom" class="w-full h-auto mx-auto object-contain rounded">
+            </div>
+            <p class="text-[11px] font-mono text-gray-300">Scan QRIS di atas menggunakan aplikasi m-Banking atau E-Wallet Anda.</p>
+            <button onclick="closeQrisModal()" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-mono text-xs font-bold rounded-xl transition">
+                TUTUP
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        function togglePasswordVisibility(inputId, eyeIconId) {
+            const inputField = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(eyeIconId);
+            
+            if (inputField && eyeIcon) {
+                if (inputField.type === "password") {
+                    inputField.type = "text";
+                    eyeIcon.classList.remove("fa-eye-slash");
+                    eyeIcon.classList.add("fa-eye");
+                } else {
+                    inputField.type = "password";
+                    eyeIcon.classList.remove("fa-eye");
+                    eyeIcon.classList.add("fa-eye-slash");
+                }
+            }
+        }
+
+        const DEFAULT_USERS = [
+            { username: 'craw', password: 'admincraw', isVip: true, isBlocked: false, role: 'admin' },
+            { username: 'user123', password: 'user123', isVip: false, isBlocked: false, role: 'user' }
+        ];
+
+        const OWNER_SECRET_CODE = '060789';
+
+        function getStorageUsers() {
+            const data = localStorage.getItem('badak_users');
+            if (!data) {
+                localStorage.setItem('badak_users', JSON.stringify(DEFAULT_USERS));
+                return DEFAULT_USERS;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveStorageUsers(users) {
+            localStorage.setItem('badak_users', JSON.stringify(users));
+        }
+
+        function getCurrentUser() {
+            const data = localStorage.getItem('badak_session');
+            return data ? JSON.parse(data) : null;
+        }
+
+        function setCurrentUser(user) {
+            localStorage.setItem('badak_session', JSON.stringify(user));
+        }
+
+        let activeOtp = null;
+        let activeOtpPhone = null;
+        let vvipActiveOtp = null;
+        let vvipActiveOtpPhone = null;
+
+        window.onload = function() {
+            localStorage.removeItem('badak_session');
+            getStorageUsers();
+            showAuthSection();
+        };
+
+        function showAuthSection() {
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('flex');
+            document.getElementById('authSection').classList.remove('hidden');
+        }
+
+        function openQrisModal() {
+            const modal = document.getElementById('qrisModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeQrisModal() {
+            const modal = document.getElementById('qrisModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openWhatsAppConfirmation() {
+            const currentUser = getCurrentUser();
+            const username = currentUser ? currentUser.username : 'Tamu';
+            const message = `Halo Owner CRAW, saya mau konfirmasi pembayaran VIP Badak Rp10.000. Username saya: ${username}`;
+            const encodedMessage = encodeURIComponent(message);
+            const waUrl = `https://api.whatsapp.com/send?phone=6289679341517&text=${encodedMessage}`;
+            window.open(waUrl, '_blank');
+        }
+
+        function openOwnerModal() {
+            const errorBox = document.getElementById('ownerModalError');
+            errorBox.classList.add('hidden');
+            document.getElementById('ownerSecretInput').value = '';
+            
+            const modal = document.getElementById('ownerModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                document.getElementById('ownerSecretInput').focus();
+            }, 100);
+        }
+
+        function closeOwnerModal() {
+            const modal = document.getElementById('ownerModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleOwnerSecretSubmit(event) {
+            event.preventDefault();
+            const inputCode = document.getElementById('ownerSecretInput').value.trim();
+            const errorBox = document.getElementById('ownerModalError');
+
+            if (inputCode === OWNER_SECRET_CODE) {
+                closeOwnerModal();
+                
+                const users = getStorageUsers();
+                let ownerUser = users.find(u => u.username === 'craw');
+                if (!ownerUser) {
+                    ownerUser = { username: 'craw', password: 'admincraw', isVip: true, isBlocked: false, role: 'admin' };
+                    users.push(ownerUser);
+                    saveStorageUsers(users);
+                } else if (ownerUser.role !== 'admin') {
+                    ownerUser.role = 'admin';
+                    saveStorageUsers(users);
+                }
+
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                const loadingText = document.getElementById('loadingText');
+                loadingText.innerText = "VERIFIKASI KODE RAHASIA OWNER...";
+                loadingOverlay.classList.remove('hidden');
+                loadingOverlay.classList.add('flex');
+
+                setTimeout(() => {
+                    loadingOverlay.classList.add('hidden');
+                    loadingOverlay.classList.remove('flex');
+                    setCurrentUser(ownerUser);
+                    initDashboard(ownerUser);
+                    switchTab('admin');
+                    showToast("AKSES RAHASIA OWNER CRAW DITERIMA!", 'success');
+                }, 1500);
+
+            } else {
+                errorBox.classList.add('hidden');
+                void errorBox.offsetWidth;
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        function showToast(message, type = 'danger') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            let bgClass = type === 'danger' ? 'bg-red-950 border-red-600 text-red-200' : 
+                         type === 'warning' ? 'bg-amber-950 border-amber-600 text-amber-200' : 
+                         'bg-emerald-950 border-emerald-600 text-emerald-200';
+
+            toast.className = `p-4 rounded-xl border shadow-2xl font-mono text-xs flex items-start gap-3 transition-all duration-300 transform translate-y-2 ${bgClass}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'danger' ? 'fa-circle-xmark' : type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-check'} text-base mt-0.5"></i>
+                <div class="flex-1">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginFormBlock').classList.add('hidden');
+            document.getElementById('registerFormBlock').classList.remove('hidden');
+            hideLoginError();
+        }
+
+        function showLoginForm() {
+            document.getElementById('registerFormBlock').classList.add('hidden');
+            document.getElementById('loginFormBlock').classList.remove('hidden');
+        }
+
+        function showLoginError(msg) {
+            const banner = document.getElementById('loginErrorBanner');
+            const text = document.getElementById('loginErrorMessage');
+            text.innerText = msg;
+            banner.classList.remove('hidden');
+        }
+
+        function hideLoginError() {
+            document.getElementById('loginErrorBanner').classList.add('hidden');
+        }
+
+        function handleLogin(event) {
+            if (event) event.preventDefault();
+            hideLoginError();
+
+            const userVal = document.getElementById('loginUsername').value.trim();
+            const passVal = document.getElementById('loginPassword').value.trim();
+
+            if (!userVal || !passVal) {
+                showLoginError("HARAP ISI USERNAME DAN SANDI!");
+                return;
+            }
+
+            const users = getStorageUsers();
+            const foundUser = users.find(u => u.username.toLowerCase() === userVal.toLowerCase());
+
+            if (!foundUser) {
+                showLoginError("USERNAME BELUM TERDAFTAR");
+                return;
+            }
+
+            if (foundUser.password !== passVal) {
+                showLoginError("SANDI USERNAME SALAH!");
+                return;
+            }
+
+            if (foundUser.isBlocked) {
+                showLoginError("AKUN ANDA DIBLOKIR OLEH ADMIN / CRAW!");
+                return;
+            }
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('hidden');
+            loadingOverlay.classList.add('flex');
+
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                loadingOverlay.classList.remove('flex');
+                setCurrentUser(foundUser);
+                initDashboard(foundUser);
+                showToast(`Selamat Datang, ${foundUser.username}!`, 'success');
+            }, 2000);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+
+            if (!username || !password) {
+                showToast("Harap isi semua kolom!", 'warning');
+                return;
+            }
+
+            const users = getStorageUsers();
+            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast("Username sudah digunakan!", 'danger');
+                return;
+            }
+
+            const newUser = {
+                username: username,
+                password: password,
+                isVip: false,
+                isBlocked: false,
+                role: 'user'
+            };
+
+            users.push(newUser);
+            saveStorageUsers(users);
+
+            showToast("Registrasi Berhasil! Silakan Login.", 'success');
+            showLoginForm();
+            document.getElementById('loginUsername').value = username;
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('badak_session');
+            showAuthSection();
+            showToast("Berhasil Keluar dari Sistem.", 'warning');
+        }
+
+        function initDashboard(user) {
+            document.getElementById('authSection').classList.add('hidden');
+            const dash = document.getElementById('mainDashboard');
+            dash.classList.remove('hidden');
+            dash.classList.add('flex');
+
+            document.getElementById('headerUserDisplay').innerText = user.username;
+            document.getElementById('sidebarUsername').innerText = user.username;
+
+            const roleBadge = document.getElementById('headerRoleBadge');
+            const sidebarVip = document.getElementById('sidebarVipStatus');
+            const sidebarVipLockIcon = document.getElementById('sidebarVipLockIcon');
+
+            if (user.role === 'admin') {
+                roleBadge.innerText = 'OWNER / ADMIN';
+                roleBadge.className = 'inline-block px-2 py-0.5 text-[10px] rounded bg-red-950 border border-red-600 text-red-400 font-bold uppercase';
+                sidebarVip.innerText = 'Status: Owner CRAW';
+                sidebarVipLockIcon.className = 'fa-solid fa-shield-check text-xs text-emerald-400';
+            } else if (user.isVip) {
+                roleBadge.innerText = 'VIP MEMBER';
+                roleBadge.className = 'inline-block px-2 py-0.5 text-[10px] rounded bg-amber-950 border border-amber-600 text-amber-400 font-bold uppercase';
+                sidebarVip.innerText = 'Status: VIP Member (Aktif)';
+                sidebarVipLockIcon.className = 'fa-solid fa-shield-check text-xs text-emerald-400';
+            } else {
+                roleBadge.innerText = 'FREE MEMBER';
+                roleBadge.className = 'inline-block px-2 py-0.5 text-[10px] rounded bg-zinc-800 border border-zinc-700 text-gray-400 font-bold uppercase';
+                sidebarVip.innerText = 'Status: Member Biasa';
+                sidebarVipLockIcon.className = 'fa-solid fa-lock text-xs text-amber-500';
+            }
+
+            renderPrivateToolButton(user);
+            switchTab('dashboard');
+        }
+
+        function renderPrivateToolButton(user) {
+            const container = document.getElementById('privateButtonContainer');
+            const lockIcon = document.getElementById('privateLockIcon');
+
+            if (user.isVip || user.role === 'admin') {
+                lockIcon.className = 'fa-solid fa-shield-check text-emerald-400';
+                container.innerHTML = `
+                    <button onclick="runBadakMethod('private')" 
+                        class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-black font-mono font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> JALANKAN BADAK PRIVATE (VIP)
+                    </button>
+                `;
+            } else {
+                lockIcon.className = 'fa-solid fa-lock text-amber-500';
+                container.innerHTML = `
+                    <button onclick="switchTab('vip')" 
+                        class="w-full py-3 px-4 bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-600/60 font-mono font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock"></i> KUNCI (BERLANGGANAN Rp.10.000)
+                    </button>
+                `;
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tabName) {
+            const currentUser = getCurrentUser();
+
+            ['dashboard', 'tools', 'vvip', 'vip', 'admin'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+            });
+
+            if (tabName === 'vvip') {
+                document.getElementById('tab-vvip').classList.remove('hidden');
+                const warningBanner = document.getElementById('vvipWarningBanner');
+                if (!currentUser || (!currentUser.isVip && currentUser.role !== 'admin')) {
+                    warningBanner.classList.remove('hidden');
+                } else {
+                    warningBanner.classList.add('hidden');
+                }
+            } else if (tabName === 'admin') {
+                document.getElementById('tab-admin').classList.remove('hidden');
+                if (!currentUser || currentUser.role !== 'admin') {
+                    document.getElementById('adminDeniedCard').classList.remove('hidden');
+                    document.getElementById('adminContentBlock').classList.add('hidden');
+                } else {
+                    document.getElementById('adminDeniedCard').classList.add('hidden');
+                    document.getElementById('adminContentBlock').classList.remove('hidden');
+                    renderAdminPanel();
+                }
+            } else {
+                document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
+        }
+
+        function sendOtp() {
+            const phoneInput = document.getElementById('waNumberInput').value.trim();
+            const statusBanner = document.getElementById('otpStatusBanner');
+
+            if (!phoneInput.startsWith('62') || phoneInput.length < 10 || isNaN(phoneInput)) {
+                statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-red-950/80 border border-red-600 text-red-200 block";
+                statusBanner.innerText = "Nomor belum terdaftar";
+                showToast("Nomor belum terdaftar atau format salah! Harus 62xxx tanpa '+' / spasi", 'danger');
+                return;
+            }
+
+            activeOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            activeOtpPhone = phoneInput;
+
+            statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-emerald-950/80 border border-emerald-600 text-emerald-200 block";
+            statusBanner.innerText = `[SMS SIMULASI] Kode OTP terkirim ke ${phoneInput}`;
+            
+            showToast(`Kode OTP Terkirim ke SMS/WA ${phoneInput}: [ ${activeOtp} ]`, 'success');
+        }
+
+        function verifyOtp() {
+            const enteredOtp = document.getElementById('otpCodeInput').value.trim();
+            const statusBanner = document.getElementById('otpStatusBanner');
+
+            if (!activeOtp) {
+                showToast("Harap klik KIRIM KODE OTP terlebih dahulu!", 'warning');
+                return;
+            }
+
+            if (enteredOtp === activeOtp) {
+                statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-emerald-950/80 border border-emerald-600 text-emerald-200 block";
+                statusBanner.innerText = "VERIFIKASI OTP BERHASIL! NOMOR TERUJI AKTIF.";
+                showToast("Verifikasi OTP Sukses!", 'success');
+            } else {
+                statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-red-950/80 border border-red-600 text-red-200 block";
+                statusBanner.innerText = "KODE OTP SALAH ATAU KADALUARSA!";
+                showToast("Kode OTP tidak valid!", 'danger');
+            }
+        }
+
+        function sendVipOtp() {
+            const currentUser = getCurrentUser();
+            if (!currentUser || (!currentUser.isVip && currentUser.role !== 'admin')) {
+                showToast("⚠️ ANDA BELUM BERLANGGANAN ‼️", 'danger');
+                return;
+            }
+
+            const phoneInput = document.getElementById('vvipWaNumberInput').value.trim();
+            const statusBanner = document.getElementById('vvipOtpStatusBanner');
+
+            if (!phoneInput.startsWith('62') || phoneInput.length < 10 || isNaN(phoneInput)) {
+                statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-amber-950/80 border border-amber-500 text-amber-200 block";
+                statusBanner.innerText = "Nomor belum terdaftar";
+                showToast("Nomor target VVIP salah atau format belum benar (62xxx)", 'danger');
+                return;
+            }
+
+            vvipActiveOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            vvipActiveOtpPhone = phoneInput;
+
+            statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-amber-950/80 border border-amber-500 text-amber-200 block";
+            statusBanner.innerText = `[VVIP SECURE SMS] Kode OTP VVIP terkirim ke ${phoneInput}`;
+            
+            showToast(`Kode OTP VVIP Terkirim ke ${phoneInput}: [ ${vvipActiveOtp} ]`, 'success');
+        }
+
+        function verifyVipOtp() {
+            const currentUser = getCurrentUser();
+            if (!currentUser || (!currentUser.isVip && currentUser.role !== 'admin')) {
+                showToast("⚠️ ANDA BELUM BERLANGGANAN ‼️", 'danger');
+                return;
+            }
+
+            const enteredOtp = document.getElementById('vvipOtpCodeInput').value.trim();
+            const statusBanner = document.getElementById('vvipOtpStatusBanner');
+
+            if (!vvipActiveOtp) {
+                showToast("Harap klik KIRIM KODE OTP VVIP terlebih dahulu!", 'warning');
+                return;
+            }
+
+            if (enteredOtp === vvipActiveOtp) {
+                statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-emerald-950/80 border border-emerald-600 text-emerald-200 block";
+                statusBanner.innerText = "VERIFIKASI OTP VVIP BERHASIL! SIAP DIEKSEKUSI.";
+                showToast("Verifikasi OTP VVIP Sukses!", 'success');
+            } else {
+                statusBanner.className = "p-3 rounded-xl font-mono text-xs font-bold text-center bg-red-950/80 border border-red-600 text-red-200 block";
+                statusBanner.innerText = "KODE OTP VVIP SALAH ATAU KADALUARSA!";
+                showToast("Kode OTP VVIP tidak valid!", 'danger');
+            }
+        }
+
+        function runBadakMethod(type) {
+            const phoneInput = document.getElementById('waNumberInput').value.trim();
+            if (!phoneInput || !phoneInput.startsWith('62')) {
+                showToast("Masukkan NOMOR WHATSAPP (62xxx) yang valid terlebih dahulu!", 'warning');
+                return;
+            }
+
+            const consoleBox = document.getElementById('codingConsoleBox');
+            const scrollBanner = document.getElementById('scrollInstructionBanner');
+            const logContainer = document.getElementById('terminalLogContent');
+            const readyAlert = document.getElementById('processReadyAlert');
+            const statusBadge = document.getElementById('consoleStatusBadge');
+
+            scrollBanner.classList.remove('hidden');
+            consoleBox.classList.remove('hidden');
+            logContainer.innerHTML = '';
+            readyAlert.classList.add('hidden');
+            statusBadge.innerText = "🚥 MENGEKSEKUSI KODE...";
+            statusBadge.className = "px-2.5 py-1 bg-red-950 text-red-400 border border-red-700 rounded text-[10px] font-bold animate-pulse";
+
+            setTimeout(() => {
+                consoleBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+
+            const codingLogs = [
+                `> 💻 [CRAW_CORE_SYS] Initializing hardening pipeline [Mode: ${type.toUpperCase()}]...`,
+                `> ⚠️ [SOCKET_CONNECT] Target acquired: +${phoneInput} @ WA_API_GATEWAY_v3`,
+                `> 🚥 [INJECTING] Writing payload -> hardening_layer.ts (anti_ban_v3)...`,
+                `> 🛡️ [COMPILING] Compiling socket encryption packets & signature verification...`,
+                `> ‼️ [BYPASS] Overriding standard rate limits & firewall restriction protocols...`,
+                `> 💻 [VERIFYING] Verifying connection integrity across secure proxy nodes...`,
+                `> ✅ [FINALIZING] System stable. Preparing final hardening sequence...`
+            ];
+
+            let index = 0;
+            const codingInterval = setInterval(() => {
+                if (index < codingLogs.length) {
+                    const p = document.createElement('div');
+                    p.className = "font-mono text-green-400 tracking-tight";
+                    p.innerText = codingLogs[index];
+                    logContainer.appendChild(p);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    index++;
+                } else {
+                    clearInterval(codingInterval);
+                    statusBadge.innerText = "✅ SELESAI";
+                    statusBadge.className = "px-2.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-700 rounded text-[10px] font-bold";
+                    
+                    scrollBanner.classList.add('hidden');
+                    readyAlert.classList.remove('hidden');
+                    showToast(`✅ Proses Badak ${type.toUpperCase()} Selesai & Terverifikasi!`, 'success');
+                }
+            }, 1000);
+        }
+
+        // FUNGSI CEK STATUS BERLANGGANAN: JIKA BELUM VIP, MUNCULKAN "ANDA BELUM BERLANGGANAN" & TIDAK BISA DIKLIK
+        function runVipBadakMethod(methodName) {
+            const currentUser = getCurrentUser();
+            if (!currentUser || (!currentUser.isVip && currentUser.role !== 'admin')) {
+                showToast("⚠️ ANDA BELUM BERLANGGANAN ‼️", 'danger');
+                return;
+            }
+
+            const phoneInput = document.getElementById('vvipWaNumberInput').value.trim();
+            if (!phoneInput || !phoneInput.startsWith('62')) {
+                showToast("Masukkan NOMOR WHATSAPP TARGET VVIP (62xxx) terlebih dahulu!", 'warning');
+                return;
+            }
+
+            const consoleBox = document.getElementById('vvipCodingConsoleBox');
+            const scrollBanner = document.getElementById('vvipScrollInstructionBanner');
+            const logContainer = document.getElementById('vvipTerminalLogContent');
+            const readyAlert = document.getElementById('vvipProcessReadyAlert');
+            const statusBadge = document.getElementById('vvipConsoleStatusBadge');
+
+            scrollBanner.classList.remove('hidden');
+            consoleBox.classList.remove('hidden');
+            logContainer.innerHTML = '';
+            readyAlert.classList.add('hidden');
+            statusBadge.innerText = "🚥 MENGEKSEKUSI KODE VVIP...";
+            statusBadge.className = "px-2.5 py-1 bg-amber-950 text-amber-300 border border-amber-600 rounded text-[10px] font-bold animate-pulse";
+
+            setTimeout(() => {
+                consoleBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+
+            const vvipLogs = [
+                `> 💻 [CRAW_VVIP_CORE] Initializing elite hardening pipeline [VVIP Method: ${methodName.toUpperCase()}]...`,
+                `> ⚠️ [SECURE_SOCKET] Target locked: +${phoneInput} @ WA_VVIP_ENCLAVE_v5`,
+                `> 🚥 [INJECTING_VVIP] Writing deep-layer bypass payload -> vvip_${methodName}_engine.ts...`,
+                `> 🛡️ [COMPILING_CRYPTO] Compiling military-grade socket certificates & signature signatures...`,
+                `> ‼️ [BYPASS_PROTOCOL] Overriding server firewall restrictions & anti-spam triggers...`,
+                `> 💻 [VERIFYING_NODES] Establishing proxy tunnel across multiple secure regions...`,
+                `> ✅ [FINALIZING_VVIP] System fully hardened under VVIP ${methodName.toUpperCase()} protocol!`
+            ];
+
+            let index = 0;
+            const vvipInterval = setInterval(() => {
+                if (index < vvipLogs.length) {
+                    const p = document.createElement('div');
+                    p.className = "font-mono text-amber-400 tracking-tight";
+                    p.innerText = vvipLogs[index];
+                    logContainer.appendChild(p);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    index++;
+                } else {
+                    clearInterval(vvipInterval);
+                    statusBadge.innerText = "✅ SELESAI VVIP";
+                    statusBadge.className = "px-2.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-700 rounded text-[10px] font-bold";
+                    
+                    scrollBanner.classList.add('hidden');
+                    readyAlert.classList.remove('hidden');
+                    showToast(`✅ Proses Badak VVIP (${methodName.toUpperCase()}) Selesai & Berhasil!`, 'success');
+                }
+            }, 1000);
+        }
+
+        function renderAdminPanel() {
+            const users = getStorageUsers();
+            
+            document.getElementById('adminTotalUsers').innerText = users.length;
+            document.getElementById('adminVipUsers').innerText = users.filter(u => u.isVip).length;
+            document.getElementById('adminBlockedUsers').innerText = users.filter(u => u.isBlocked).length;
+
+            const tbody = document.getElementById('adminUserTableBody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-red-950/20 transition";
+
+                const vipBadge = user.isVip ? 
+                    `<span class="px-2 py-0.5 rounded bg-amber-950 border border-amber-600 text-amber-400 font-bold">VIP</span>` :
+                    `<span class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-gray-400">BIASA</span>`;
+
+                const roleBadge = user.role === 'admin' ? 
+                    `<span class="px-2 py-0.5 rounded bg-red-950 border border-red-600 text-red-400 font-bold">OWNER</span>` :
+                    `<span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-gray-300">USER</span>`;
+
+                const blockBadge = user.isBlocked ?
+                    `<span class="px-2 py-0.5 rounded bg-red-950 border border-red-600 text-red-500 font-bold">DIBLOKIR</span>` :
+                    `<span class="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-700 text-emerald-400">AKTIF</span>`;
+
+                const actions = user.username === 'craw' ? 
+                    `<span class="text-gray-500 italic">UTAMA</span>` :
+                    `
+                    <div class="flex items-center justify-end gap-1 flex-wrap">
+                        <button onclick="toggleUserRole('${user.username}')" class="px-2 py-1 bg-amber-950/80 hover:bg-amber-900 text-amber-400 border border-amber-600 rounded text-[10px] font-bold transition">
+                            ${user.role === 'admin' ? 'Jadikan User' : 'Jadikan Owner'}
+                        </button>
+                        <button onclick="toggleUserVip('${user.username}')" class="px-2 py-1 ${user.isVip ? 'bg-zinc-800 text-gray-300' : 'bg-amber-600 text-black'} font-bold rounded text-[10px] hover:opacity-80 transition">
+                            ${user.isVip ? 'Hapus VIP' : 'VIP'}
+                        </button>
+                        <button onclick="toggleUserBlock('${user.username}')" class="px-2 py-1 ${user.isBlocked ? 'bg-emerald-700 text-white' : 'bg-red-700 text-white'} font-bold rounded text-[10px] hover:opacity-80 transition">
+                            ${user.isBlocked ? 'Unblokir' : 'BLOKIR PENGGUNA'}
+                        </button>
+                    </div>
+                    `;
+
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white">${user.username}</td>
+                    <td class="p-3 font-mono text-amber-300 bg-black/40 rounded px-2">${user.password}</td>
+                    <td class="p-3">${roleBadge}</td>
+                    <td class="p-3">${vipBadge}</td>
+                    <td class="p-3">${blockBadge}</td>
+                    <td class="p-3 text-right">${actions}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleUserRole(username) {
+            const users = getStorageUsers();
+            const target = users.find(u => u.username === username);
+            if (target) {
+                target.role = target.role === 'admin' ? 'user' : 'admin';
+                saveStorageUsers(users);
+
+                const sessionUser = getCurrentUser();
+                if (sessionUser && sessionUser.username === username) {
+                    sessionUser.role = target.role;
+                    setCurrentUser(sessionUser);
+                    initDashboard(sessionUser);
+                }
+
+                renderAdminPanel();
+                showToast(`Role ${username} diubah menjadi: ${target.role.toUpperCase()}`, 'success');
+            }
+        }
+
+        function toggleUserVip(username) {
+            const users = getStorageUsers();
+            const target = users.find(u => u.username === username);
+            if (target) {
+                target.isVip = !target.isVip;
+                saveStorageUsers(users);
+
+                const sessionUser = getCurrentUser();
+                if (sessionUser && sessionUser.username === username) {
+                    sessionUser.isVip = target.isVip;
+                    setCurrentUser(sessionUser);
+                    initDashboard(sessionUser);
+                }
+
+                renderAdminPanel();
+                showToast(`Status VIP ${username} diubah menjadi: ${target.isVip ? 'BERLANGGANAN' : 'TIDAK BERLANGGANAN'}`, 'success');
+            }
+        }
+
+        function toggleUserBlock(username) {
+            const users = getStorageUsers();
+            const target = users.find(u => u.username === username);
+            if (target) {
+                target.isBlocked = !target.isBlocked;
+                saveStorageUsers(users);
+
+                renderAdminPanel();
+                showToast(`Status Akun ${username}: ${target.isBlocked ? 'DIBLOKIR' : 'AKTIF'}`, target.isBlocked ? 'danger' : 'success');
+            }
+        }
+    </script>
+</body>
+</html>
